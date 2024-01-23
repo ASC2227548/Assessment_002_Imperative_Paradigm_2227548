@@ -50,7 +50,7 @@ print('Solve puzzles to unlock areas and use tactics and items collected in boss
 player_stats = {"Health": 70, "Suit": 50, "Hunger": 75}
 
 items = {
-    "SUIT REPAIR": 1,
+    "SUIT REPAIR": 10,
     "ACCESS CARD": 0,
     "GUN": 0,
     "KNIFE": 0,
@@ -87,8 +87,9 @@ while True:
                     print(f"No need to use {item_to_use}. Health is already at 100.")
             elif item_to_use == "SUIT REPAIR":
                 if player_stats["Suit"] < 100:
-                    player_stats["Suit"] += 10
-                    print(f"Used {item_to_use}. Suit Repaired by 10%.")
+                    suit_to_restore = min(100 - player_stats["Suit"], 20)
+                    player_stats["Suit"] += suit_to_restore
+                    print(f"Used a {item_to_use}. Suit repaired {suit_to_restore}%.")
                     items[item_to_use] -= 1
                 else:
                     print(f"No need to use {item_to_use}. Suit is already at 100%.")
