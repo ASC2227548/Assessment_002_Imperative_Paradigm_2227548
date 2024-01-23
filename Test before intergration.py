@@ -46,13 +46,15 @@ print('Awakening alone on a silent space station, the whereabouts of Dr. Mercer\
 print('Dr. Mercer must navigate through the station, find his crew-mates, and discover why the station is powered down.')
 print('Solve puzzles to unlock areas and use tactics and items collected in boss fights to end Dr. Mercer\'s worst nightmare.')
 
-player_stats = {"Health": 100, "Suit": 50, "Hunger": 75}
+player_stats = {"Health": 90, "Suit": 50, "Hunger": 75}
 
 items = {
-    "FLASHLIGHT": 1,
-    "MAP": 0,
+    "SUIT REPAIR": 1,
     "ACCESS CARD": 0,
-    "MEDKIT": 0
+    "GUN": 0,
+    "KNIFE": 0,
+    "MEDKIT": 1
+
 }
 
 while True:
@@ -74,7 +76,7 @@ while True:
     elif choice == "2":
         item_to_use = input("Enter the name of the item to use: ").upper()
         if item_to_use in items and items[item_to_use] > 0:
-            if item_to_use == "HEALTH PACK":
+            if item_to_use == "MEDKIT":
                 if player_stats["Health"] < 100:
                     player_stats["Health"] += 20
                     print(f"Used a {item_to_use}. Health increased by 20.")
