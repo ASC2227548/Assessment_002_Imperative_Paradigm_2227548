@@ -1,4 +1,5 @@
 import random
+
 def navigate_room(current_room, direction):
     if direction in current_room['exits']:
         return rooms[current_room['exits'][direction]]
@@ -46,7 +47,7 @@ print('Awakening alone on a silent space station, the whereabouts of Dr. Mercer\
 print('Dr. Mercer must navigate through the station, find his crew-mates, and discover why the station is powered down.')
 print('Solve puzzles to unlock areas and use tactics and items collected in boss fights to end Dr. Mercer\'s worst nightmare.')
 
-player_stats = {"Health": 90, "Suit": 50, "Hunger": 75}
+player_stats = {"Health": 70, "Suit": 50, "Hunger": 75}
 
 items = {
     "SUIT REPAIR": 1,
@@ -78,8 +79,9 @@ while True:
         if item_to_use in items and items[item_to_use] > 0:
             if item_to_use == "MEDKIT":
                 if player_stats["Health"] < 100:
-                    player_stats["Health"] += 20
-                    print(f"Used a {item_to_use}. Health increased by 20.")
+                    health_to_restore = min(100 - player_stats["Health"], 20)
+                    player_stats["Health"] += health_to_restore
+                    print(f"Used a {item_to_use}. Health increased by {health_to_restore}.")
                     items[item_to_use] -= 1
                 else:
                     print(f"No need to use {item_to_use}. Health is already at 100.")
