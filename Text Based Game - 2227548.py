@@ -61,6 +61,10 @@ while True:
         print("Invalid choice. Please enter a number between 1 and 4.")
 
 
+room_1 = input('now choose to go NESW?: ')
+
+if room_1 == "N":
+    print('u find a cupboard')
 
 
 
