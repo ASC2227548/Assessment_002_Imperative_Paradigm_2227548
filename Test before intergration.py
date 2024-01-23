@@ -54,6 +54,7 @@ items = {
     "ACCESS CARD": 0,
     "GUN": 0,
     "KNIFE": 0,
+    "MRE": 5,
     "MEDKIT": 1
 
 }
@@ -87,7 +88,7 @@ while True:
                     print(f"No need to use {item_to_use}. Health is already at 100.")
             elif item_to_use == "SUIT REPAIR":
                 if player_stats["Suit"] < 100:
-                    suit_to_restore = min(100 - player_stats["Suit"], 20)
+                    suit_to_restore = min(100 - player_stats["Suit"], 15)
                     player_stats["Suit"] += suit_to_restore
                     print(f"Used a {item_to_use}. Suit repaired {suit_to_restore}%.")
                     items[item_to_use] -= 1
@@ -95,8 +96,9 @@ while True:
                     print(f"No need to use {item_to_use}. Suit is already at 100%.")
             elif item_to_use == "MRE":
                 if player_stats["Hunger"] < 100:
-                    player_stats["Hunger"] += 15
-                    print(f"Used {item_to_use}. Hunger decreased by 15%.")
+                    hunger_to_restore = min(100 - player_stats["Hunger"], 10)
+                    player_stats["Hunger"] += hunger_to_restore
+                    print(f"Used a {item_to_use}. Hunger decreased by {hunger_to_restore}%.")
                     items[item_to_use] -= 1
                 else:
                     print(f"No need to use {item_to_use}. Hunger is already at 100%.")
