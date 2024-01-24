@@ -10,29 +10,34 @@ def navigate_room(current_room, direction):
                 for item, quantity in current_room['items'].items():
                     print(f"{item}: Quantity: {quantity}")
 
-                # Ask the player if they want to pick up all items in the current room
-                pickup_choice = input("Do you want to pick up all items? (yes/no): ").lower()
+                while True:
+                    # Ask the player if they want to pick up all items in the current room
+                    pickup_choice = input("Do you want to pick up all items? (yes/no): ").lower()
 
-                if pickup_choice == 'yes':
-                    # Automatically pick up all items in the current room
-                    for item, quantity in current_room['items'].items():
-                        # Add the item to the player's inventory
-                        if item in items:
-                            items[item] += quantity
-                        else:
-                            items[item] = quantity
+                    if pickup_choice == 'yes':
+                        # Automatically pick up all items in the current room
+                        for item, quantity in current_room['items'].items():
+                            # Add the item to the player's inventory
+                            if item in items:
+                                items[item] += quantity
+                            else:
+                                items[item] = quantity
 
-                        print(f"You picked up {quantity} {item}(s).")
+                            print(f"You picked up {quantity} {item}(s).")
 
-                    # Clear the items in the current room
-                    current_room['items'] = {}
-                elif pickup_choice != 'no':
-                    print("Invalid input. Please enter 'yes' or 'no'.")
+                        # Clear the items in the current room
+                        current_room['items'] = {}
+                        break  # Exit the loop if the player provided valid input
+                    elif pickup_choice == 'no':
+                        break  # Exit the loop if the player doesn't want to pick up items
+                    else:
+                        print("Invalid input. Please enter 'yes' or 'no'.")
 
         return next_room
     else:
         print("Invalid direction.")
         return current_room
+
 
 
 
@@ -52,7 +57,7 @@ corridor = {
     'name': 'Corridor',
     'description': 'You find yourself in a long corridor. There are doors towards the West and South.',
     'exits': {'S': 'Control Room', 'W': 'Storage Room', 'N': 'Cargo Room'},
-    'items': {'MEDKIT': 1}
+    'items': {}
 }
 
 control_room = {
@@ -66,7 +71,7 @@ storage_room = {
     'name': 'Storage Room',
     'description': 'A room filled with boxes and supplies. There is a small locked door in the corner to the North, or return to the corridor to the East.',
     'exits': {'N': 'Small Door', 'E': 'Corridor'},
-    'items': {'MEDKIT': 1,}
+    'items': {'KNIFE': 1,}
 }
 cargo_room = {
     'name': 'Cargo Room',
@@ -109,7 +114,7 @@ while True:
     choice = input("Enter your choice (1-5): ")
 
     if choice == "1":
-        print("Inventory:")
+        print("INVENTORY:")
         for item, quantity in items.items():
             print(f"{item}: Quantity: {quantity}")
     elif choice == "2":
