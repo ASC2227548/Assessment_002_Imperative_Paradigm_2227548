@@ -3,41 +3,53 @@ def navigate_room(current_room, direction):
         next_room_name = current_room['exits'][direction]
         next_room = rooms[next_room_name]
 
-        # Check if there are items in the current room
-        if 'items' in current_room:
-            if current_room['items']:
-                print("You found the following items:")
-                for item, quantity in current_room['items'].items():
-                    print(f"{item}: Quantity: {quantity}")
+        # Check if the room is locked
+        is_locked = next_room.get('locked', False)
 
-                while True:
-                    # Ask the player if they want to pick up all items in the current room
-                    pickup_choice = input("Do you want to pick up all items? (yes/no): ").lower()
+        if is_locked:
+            # Check if player has the access card
+            if "ACCESS CARD" in items and items["ACCESS CARD"] > 0:
+                print("You unlock the door with your access card and enter the", next_room_name)
+                # Set the room as unlocked
+                next_room['locked'] = False
+                return next_room
+            else:
+                print("The door is locked. You need an access card to enter.")
+                return current_room
+        else:
+            # Handle normal room navigation
+            if 'items' in next_room:
+                if next_room['items']:
+                    print(f"You enter the {next_room_name} and find the following items:")
+                    for item, quantity in next_room['items'].items():
+                        print(f"{item}: Quantity: {quantity}")
 
-                    if pickup_choice == 'yes':
-                        # Automatically pick up all items in the current room
-                        for item, quantity in current_room['items'].items():
-                            # Add the item to the player's inventory
-                            if item in items:
-                                items[item] += quantity
-                            else:
-                                items[item] = quantity
+                    while True:
+                        # Ask the player if they want to pick up all items in the current room
+                        pickup_choice = input("Do you want to pick up all items? (yes/no): ").lower()
 
-                            print(f"You picked up {quantity} {item}(s).")
+                        if pickup_choice == 'yes':
+                            # Automatically pick up all items in the current room
+                            for item, quantity in next_room['items'].items():
+                                # Add the item to the player's inventory
+                                if item in items:
+                                    items[item] += quantity
+                                else:
+                                    items[item] = quantity
 
-                        # Clear the items in the current room
-                        current_room['items'] = {}
-                        break  # Exit the loop if the player provided valid input
-                    elif pickup_choice == 'no':
-                        break  # Exit the loop if the player doesn't want to pick up items
-                    else:
-                        print("Invalid input. Please enter 'yes' or 'no'.")
+                            print("You picked up the items.")
+                            # Clear the items in the current room
+                            next_room['items'] = {}
+                            break  # Exit the loop if the player provided valid input
+                        elif pickup_choice == 'no':
+                            break  # Exit the loop if the player doesn't want to pick up items
+                        else:
+                            print("Invalid input. Please enter 'yes' or 'no'.")
 
-        return next_room
+            return next_room
     else:
         print("Invalid direction.")
         return current_room
-
 
 
 
@@ -50,7 +62,7 @@ crew_room = {
     'name': 'Crew Room',
     'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of alarms.\nYou need to find your crew members. The door is towards the south, there is a cupboard to the west.',
     'exits': {'S': 'Corridor'},
-    'items': {'SUIT REPAIR': 1}
+    'items': {}
 }
 
 corridor = {
@@ -68,22 +80,38 @@ control_room = {
 }
 
 storage_room = {
-    'name': 'Storage Room',
-    'description': 'A room filled with boxes and supplies. There is a small locked door in the corner to the North, or return to the corridor to the East.',
-    'exits': {'N': 'Small Door', 'E': 'Corridor'},
-    'items': {'KNIFE': 1,}
+  'name': 'Storage Room',
+  'description': 'A room filled with boxes and supplies. There is a small locked door in the corner to the North, or return to the corridor to the East.',
+  'exits': {'N': 'Small Door', 'E': 'Corridor'},
+  'items': {'KNIFE': 1},
+  # Add a new key for "locked": True
+  'locked': True,
 }
+
 cargo_room = {
     'name': 'Cargo Room',
     'description': 'A room with crates and vehicles. There is a box to the west, or return to the corridor to the south.',
     'exits': {'S': 'Corridor', 'N': 'Locked Room'},
     'items': {'MEDKIT': 1}
 }
+
+small_door_room = {
+  'name': 'Small Door',
+  'description': 'A small, dimly lit room. You spot a gun on a table.',  # Add your desired description
+  'exits': {'S': 'Storage Room'},  # Add exits as needed
+  'items': {'GUN': 1},  # Add the gun to the room
+}
+
+
+
+
+
+
 # Set starting room
 current_room = crew_room
 
 # Create a dictionary to store all rooms
-rooms = {'Crew Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room, 'Cargo Room': cargo_room}
+rooms = {'Crew Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room, 'Cargo Room': cargo_room, 'Small Door': small_door_room,}
 
 print('Welcome to Astray')
 print('Awakening alone on a silent space station, the whereabouts of Dr. Mercer\'s fellow crew members are unknown.')
