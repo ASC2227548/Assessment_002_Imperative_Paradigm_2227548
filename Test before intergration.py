@@ -1,11 +1,44 @@
-import random
-
 def navigate_room(current_room, direction):
     if direction in current_room['exits']:
-        return rooms[current_room['exits'][direction]]
+        next_room_name = current_room['exits'][direction]
+        next_room = rooms[next_room_name]
+
+        # Check if there are items in the current room
+        if 'items' in current_room:
+            if current_room['items']:
+                print("You found the following items:")
+                for item, quantity in current_room['items'].items():
+                    print(f"{item}: Quantity: {quantity}")
+
+                # Ask the player if they want to pick up all items in the current room
+                pickup_choice = input("Do you want to pick up all items? (yes/no): ").lower()
+
+                if pickup_choice == 'yes':
+                    # Automatically pick up all items in the current room
+                    for item, quantity in current_room['items'].items():
+                        # Add the item to the player's inventory
+                        if item in items:
+                            items[item] += quantity
+                        else:
+                            items[item] = quantity
+
+                        print(f"You picked up {quantity} {item}(s).")
+
+                    # Clear the items in the current room
+                    current_room['items'] = {}
+                elif pickup_choice != 'no':
+                    print("Invalid input. Please enter 'yes' or 'no'.")
+
+        return next_room
     else:
         print("Invalid direction.")
         return current_room
+
+
+
+
+
+
 
 # Define my rooms
 crew_room = {
@@ -33,7 +66,7 @@ storage_room = {
     'name': 'Storage Room',
     'description': 'A room filled with boxes and supplies. There is a small locked door in the corner to the North, or return to the corridor to the East.',
     'exits': {'N': 'Small Door', 'E': 'Corridor'},
-    'items': {'MEDKIT': 1}
+    'items': {'MEDKIT': 1,}
 }
 cargo_room = {
     'name': 'Cargo Room',
@@ -41,12 +74,11 @@ cargo_room = {
     'exits': {'S': 'Corridor', 'N': 'Locked Room'},
     'items': {'MEDKIT': 1}
 }
-
 # Set starting room
 current_room = crew_room
 
 # Create a dictionary to store all rooms
-rooms = {'Starting Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room, 'Cargo Room': cargo_room}
+rooms = {'Crew Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room, 'Cargo Room': cargo_room}
 
 print('Welcome to Astray')
 print('Awakening alone on a silent space station, the whereabouts of Dr. Mercer\'s fellow crew members are unknown.')
@@ -56,17 +88,16 @@ print('Solve puzzles to unlock areas and use tactics and items collected in boss
 player_stats = {"Health": 70, "Suit": 50, "Hunger": 75}
 
 items = {
-    "SUIT REPAIR": 1,
+    "SUIT REPAIR": 0,
     "ACCESS CARD": 0,
     "GUN": 0,
     "KNIFE": 0,
     "MRE": 1,
     "MEDKIT": 1
-
 }
 
 while True:
-    print(f"\nYou are in the {current_room['name']}")
+    print(f"\nYou are in {current_room['name']}")
     print(current_room['description'])
 
     print("\n1. Display inventory")
@@ -78,7 +109,7 @@ while True:
     choice = input("Enter your choice (1-5): ")
 
     if choice == "1":
-        print("INVENTORY:")
+        print("Inventory:")
         for item, quantity in items.items():
             print(f"{item}: Quantity: {quantity}")
     elif choice == "2":
