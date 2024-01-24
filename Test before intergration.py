@@ -7,40 +7,46 @@ def navigate_room(current_room, direction):
         print("Invalid direction.")
         return current_room
 
-# Define your rooms
-starting_room = {
-    'name': 'Starting Room',
-    'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of machinery.',
-    'exits': {'E': 'Corridor'},
-    'items': {'FLASHLIGHT': 1}
+# Define my rooms
+crew_room = {
+    'name': 'Crew Room',
+    'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of alarms.\nYou need to find your crew members. The door is towards the south, there is a cupboard to the west.',
+    'exits': {'S': 'Corridor'},
+    'items': {'SUIT REPAIR': 1}
 }
 
 corridor = {
     'name': 'Corridor',
-    'description': 'You find yourself in a long corridor. There are doors to the North and West.',
-    'exits': {'N': 'Control Room', 'W': 'Storage Room'},
-    'items': {'MAP': 1}
+    'description': 'You find yourself in a long corridor. There are doors towards the West and South.',
+    'exits': {'S': 'Control Room', 'W': 'Storage Room', 'N': 'Cargo Room'},
+    'items': {'MEDKIT': 1}
 }
 
 control_room = {
     'name': 'Control Room',
     'description': 'You enter a room filled with control panels. A computer screen flickers with a message.',
-    'exits': {'S': 'Corridor'},
+    'exits': {'N': 'Corridor'},
     'items': {'ACCESS CARD': 1}
 }
 
 storage_room = {
     'name': 'Storage Room',
-    'description': 'A room filled with crates and supplies. There is a door to the East.',
-    'exits': {'E': 'Corridor'},
+    'description': 'A room filled with boxes and supplies. There is a small locked door in the corner to the North, or return to the corridor to the East.',
+    'exits': {'N': 'Small Door', 'E': 'Corridor'},
+    'items': {'MEDKIT': 1}
+}
+cargo_room = {
+    'name': 'Cargo Room',
+    'description': 'A room with crates and vehicles. There is a box to the west, or return to the corridor to the south.',
+    'exits': {'S': 'Corridor', 'N': 'Locked Room'},
     'items': {'MEDKIT': 1}
 }
 
 # Set starting room
-current_room = starting_room
+current_room = crew_room
 
 # Create a dictionary to store all rooms
-rooms = {'Starting Room': starting_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room}
+rooms = {'Starting Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room, 'Cargo Room': cargo_room}
 
 print('Welcome to Astray')
 print('Awakening alone on a silent space station, the whereabouts of Dr. Mercer\'s fellow crew members are unknown.')
@@ -50,17 +56,17 @@ print('Solve puzzles to unlock areas and use tactics and items collected in boss
 player_stats = {"Health": 70, "Suit": 50, "Hunger": 75}
 
 items = {
-    "SUIT REPAIR": 10,
+    "SUIT REPAIR": 1,
     "ACCESS CARD": 0,
     "GUN": 0,
     "KNIFE": 0,
-    "MRE": 5,
+    "MRE": 1,
     "MEDKIT": 1
 
 }
 
 while True:
-    print(f"\nYou are in {current_room['name']}")
+    print(f"\nYou are in the {current_room['name']}")
     print(current_room['description'])
 
     print("\n1. Display inventory")
@@ -72,7 +78,7 @@ while True:
     choice = input("Enter your choice (1-5): ")
 
     if choice == "1":
-        print("Inventory:")
+        print("INVENTORY:")
         for item, quantity in items.items():
             print(f"{item}: Quantity: {quantity}")
     elif choice == "2":
