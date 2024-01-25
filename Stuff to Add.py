@@ -1,4 +1,4 @@
-# Define your rooms
+# Defining the rooms, with a name, description, exits, and items to pick up
 crew_room = {
     'name': 'Crew Room',
     'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of alarms.\nYou need to find your crew members. The door is towards the south, there is a cupboard to the west.',
@@ -62,7 +62,7 @@ south_storage_room = {
 def solve_number_puzzle(current_room):
     print("You encounter a locked door with a numeric keypad.")
 
-    # Get the player's input for the three numbers
+    # get the player's input for the three numbers
     guess = []
     while True:
         try:
@@ -72,7 +72,7 @@ def solve_number_puzzle(current_room):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-    # Get input for the second number
+
     while True:
         try:
             number = int(input("Enter the 2nd number: "))
@@ -81,7 +81,7 @@ def solve_number_puzzle(current_room):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-    # Get input for the third number
+
     while True:
         try:
             number = int(input("Enter the 3rd number: "))
@@ -90,7 +90,7 @@ def solve_number_puzzle(current_room):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-    # Check if the guess matches the lock combination
+    # check if the guess matches the password
     if guess == current_room.get('lock_combination', []):
         print("Congratulations! The door unlocks.")
         current_room['locked'] = False
@@ -100,37 +100,36 @@ def solve_number_puzzle(current_room):
         return False
 
 
-# Modify your navigate_room function to handle puzzles and display items
+#
 def navigate_room(current_room, direction):
     if direction in current_room['exits']:
         next_room_name = current_room['exits'][direction]
         next_room = rooms[next_room_name]
 
-        # Check if the room is locked
+        # see if the room is locked
         is_locked = next_room.get('locked', False)
 
         if is_locked:
-            # Check if player has the access card
+            # check if player has the access card
             if next_room_name == 'Control Room':
                 print("The door to the Control Room is locked.")
                 if solve_number_puzzle(next_room):
                     print("You unlock the door.")
                     next_room['locked'] = False
-                    clear_room_items(next_room)  # Clear items in the room
-                    return next_room  # Return early after unlocking the door
+                    return next_room
                 else:
                     print("The door remains locked.")
                     return current_room
             elif "ACCESS CARD" in items and items["ACCESS CARD"] > 0:
                 print(f"You unlock the door with your access card and enter the {next_room_name}")
-                # Set the room as unlocked
+                # unlock the room
                 next_room['locked'] = False
                 return next_room
             else:
                 print(f"The door to {next_room_name} is locked. You need an access card to enter.")
                 return current_room
         else:
-            # Handle normal room navigation
+            # room navigation
             room_items = next_room.get('items', {})
             if room_items and room_items.keys():
                 print(f"You enter the {next_room_name} and find the following items:")
@@ -140,14 +139,14 @@ def navigate_room(current_room, direction):
                 pickup_choice = input("Do you want to pick up all items? (yes/no): ").lower()
 
                 if pickup_choice == 'yes':
-                    # Automatically pick up all items in the current room
+                    # pick up all items in the room
                     for item, quantity in room_items.items():
                         if item in items:
                             items[item] += quantity
                         else:
                             items[item] = quantity
                     print("You picked up the items.")
-                    # Clear the items in the current room
+                    # clear the items in the room after picking up
                     next_room['items'] = {}
                 elif pickup_choice != 'no':
                     print("Invalid input. Please enter 'yes' or 'no'.")
@@ -156,12 +155,6 @@ def navigate_room(current_room, direction):
     else:
         print("Invalid direction.")
         return current_room
-
-
-# Helper function to clear items in a room
-def clear_room_items(room):
-    if 'items' in room:
-        room['items'] = {}
 
 
 # Create a dictionary to store all rooms
