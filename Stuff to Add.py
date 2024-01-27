@@ -1,22 +1,3 @@
-import time
-
-
-hunger = 70
-
-
-decrease_rate = 10
-time_interval = 1
-
-
-while True:
-
-    if hunger <= 0:
-        print("Game over! Your character has starved.")
-        break
-
-    player_stats['Hunger'] -- decrease_rate
-    print(f"Hunger level: {hunger}")
-    time.sleep(time_interval)
 
 
 def alien_encounter():
