@@ -1,4 +1,7 @@
-# Defining the rooms, with a name, description, exits, and items to pick up
+import random
+
+# Define the rooms, exits, items, etc.
+
 crew_room = {
     'name': 'Crew Room',
     'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of alarms.\nYou need to find your crew members. The door is towards the south, there is a cupboard to the west.',
@@ -19,7 +22,7 @@ control_room = {
     'exits': {'N': 'Corridor', 'W': 'West Control Room'},
     'items': {},
     'locked': True,
-    'lock_combination': [3, 7, 1]  # Add a lock combination
+    'lock_combination': [3, 7, 1]  # lock combination
 }
 
 storage_room = {
@@ -33,7 +36,7 @@ storage_room = {
 cargo_room = {
     'name': 'Cargo Room',
     'description': 'A room with crates and vehicles. There is a box to the west, or return to the corridor to the south.',
-    'exits': {'S': 'Corridor', 'N': 'Locked Room'},
+    'exits': {'S': 'Corridor',},
     'items': {'MEDKIT': 1}
 }
 
@@ -41,14 +44,16 @@ small_door_room = {
     'name': 'Small Door',
     'description': 'A small, dimly lit room. You spot a gun on a table.',
     'exits': {'S': 'Storage Room'},
-    'items': {'GUN': 1}
+    'items': {},
+    'alien': True,
+    'alien_health': 50
 }
 
 west_control_room = {
     'name': 'West Control Room',
     'description': 'Nothing but a access card and a flickering screen. Return to the main control room to the east',
-    'exits': {'E': 'Control Room'},  # Assume there's an exit back to Control Room
-    'items': {'ACCESS CARD': 1},  # Add the key to the west control room
+    'exits': {'E': 'Control Room'},
+    'items': {'ACCESS CARD': 1},  # the access card
 }
 south_storage_room = {
     'name': 'South Storage Room',
@@ -57,8 +62,7 @@ south_storage_room = {
     'items': {'KNIFE': 1},  # Add the key to the west control room
 }
 
-
-# Define the solve_number_puzzle() function to take the current room as an argument
+# define the number pad puzzle
 def solve_number_puzzle(current_room):
     print("You encounter a locked door with a numeric keypad.")
 
@@ -156,6 +160,56 @@ def navigate_room(current_room, direction):
         print("Invalid direction.")
         return current_room
 
+# define the alien fight function
+def encounter_enemy(current_room, player_stats):
+    if 'alien' in current_room:
+        alien = current_room['alien']
+        alien_health = current_room.get('alien_health', 50)
+        print(f"You encounter an alien!")
+
+        #  alien fight choice
+        while player_stats['Health'] > 0 and alien_health > 0:
+            print("Choose how to attack:")
+            print("1. Normal Attack")
+            print("2. Strong Attack")
+            print("3. Quick Attack")
+            attack_choice = input("Enter your choice (1-3): ")
+
+            if attack_choice == "1":
+                player_damage = random.randint(10, 20)
+            elif attack_choice == "2":
+                player_damage = random.randint(20, 30)
+            elif attack_choice == "3":
+                player_damage = random.randint(5, 15)
+            else:
+                print("Invalid choice. Try again.")
+                continue
+
+            print(f"You attack the alien and deal {player_damage} damage.")
+            alien_health -= player_damage
+
+            if alien_health <= 0:
+                print(f"You defeated the alien!")
+                del current_room['alien']
+                del current_room['alien_health']
+                break
+
+            # when the alien attacks it does random damage between 5 and 15
+            alien_damage = random.randint(5, 15)
+            print(f"The alien attacks you and deals {alien_damage} damage.")
+            player_stats['Health'] -= alien_damage
+
+            # suit damage to give the players a sense of armour
+            suit_damage = random.randint(5, 10)
+            print(f"Your suit sustains {suit_damage} damage.")
+            player_stats['Suit'] -= suit_damage
+
+            print(f"Your health: {player_stats['Health']}")
+            print(f"Your suit: {player_stats['Suit']}")
+
+            if player_stats['Health'] <= 0:
+                print("You've been defeated!")
+                exit()
 
 # dictionary with all the rooms
 rooms = {'Crew Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room,
@@ -186,6 +240,8 @@ items = {
 
 
 while True:
+    encounter_enemy(current_room, player_stats)
+
     # print current room information
     print(f"\nYou are in {current_room['name']}")
     print(current_room['description'])

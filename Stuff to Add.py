@@ -26,4 +26,4 @@ def alien_encounter():
         return -15  # player takes damage
     else:
         print("Invalid choice. The alien attacks you.")
-        return -15  # player takes damag
+        return -15  # player takes damage
