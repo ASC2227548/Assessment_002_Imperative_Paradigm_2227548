@@ -27,3 +27,9 @@ def alien_encounter():
     else:
         print("Invalid choice. The alien attacks you.")
         return -15  # player takes damage
+
+
+
+def alien_2():
+    print("You encounter another alien")
+
