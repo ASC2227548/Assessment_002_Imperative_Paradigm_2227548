@@ -1,6 +1,6 @@
 import random
 
-# dictionaries of the rooms, exits, items, etc.
+# dictionaries with dictionaries of the rooms, exits, items or aliens and locked doors
 
 crew_room = {
     'name': 'Crew Room',
@@ -39,7 +39,8 @@ control_room = {
     'exits': {'N': 'Corridor', 'W': 'West Control Room'},
     'items': {},
     'locked': True,
-    'lock_combination': [3, 7, 1]  # lock combination
+    # lock combination
+    'lock_combination': [3, 7, 1]
 }
 
 storage_room = {
@@ -93,22 +94,26 @@ west_control_room = {
     'name': 'West Control Room',
     'description': 'Nothing but a access card and a flickering screen. Return to the main control room to the east',
     'exits': {'E': 'Control Room'},
-    'items': {'ACCESS CARD': 1},  # the access card
+    # there will be one access card in the west control room
+    'items': {'ACCESS CARD': 1},
 }
 south_storage_room = {
     'name': 'South Storage Room',
     'description': 'You found a knife in a broken box, and a code writen in blood on the wall, it reads "970". Head north to return to the centre of the storage room',
-    'exits': {'N': 'Storage Room'},  # Assume there's an exit back to Control Room
-    'items': {'KNIFE': 1, 'SUIT REPAIR': 1},  # Add the key to the west control room
+    # exit back to Control Room
+    'exits': {'N': 'Storage Room'},
+    # Add the key to the west control room
+    'items': {'KNIFE': 1, 'SUIT REPAIR': 1},
 }
 
-# define the number pad puzzle
+# define the number pad puzzle, this can be used to multiple doors now
 def number_puzzle(current_room):
     print("You encounter a locked door with a numeric keypad.")
 
     # get the player's input for the three numbers
     guess = []
     while True:
+        # try and except block for exception handling
         try:
             number = int(input("Enter the 1st number: "))
             guess.append(number)
@@ -137,14 +142,16 @@ def number_puzzle(current_room):
     # check if the guess matches the password
     if guess == current_room.get('lock_combination', []):
         print("Congratulations! The door unlocks.")
+        # if the current room has the is_locked variable and the password is right it sets to false to unlock the door.
         current_room['locked'] = False
+        # once the player gets it right no need to run again
         return True
     else:
         print("Incorrect combination. The door remains locked.")
         return False
 
 
-# define navigation and how its done
+# define navigation and how to navigate
 def navigate_room(current_room, direction):
     if direction in current_room['exits']:
         next_room_name = current_room['exits'][direction]
