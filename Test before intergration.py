@@ -1,18 +1,35 @@
 import random
 
-# Define the rooms, exits, items, etc.
+# dictionaries of the rooms, exits, items, etc.
 
 crew_room = {
     'name': 'Crew Room',
-    'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of alarms.\nYou need to find your crew members. The door is towards the south, there is a cupboard to the west.',
+    'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of alarms.\nYou need to find your crew members. The door is towards the south.',
     'exits': {'S': 'Corridor'},
     'items': {}
 }
 
+cafe = {
+    'name': 'Cafe',
+    'description': 'You find the cafe, something catches your eye south of the room.',
+    'exits': {'S': 'South Cafe', 'W': 'Corridor'},
+    'items': {},
+
+
+}
+
+south_cafe = {
+    'name': 'South Cafe',
+    'description': 'You find some supplies. You also see a piece of paper with something you crew-member wrote, "THE 3rd OF JULY(7th MONTH) IS THE 1st TIME I WAS HAPPY". Return to the cafe to the north',
+    'exits': {'N': 'Cafe'},
+    'items': {'MEDKIT': 1, 'SUIT REPAIR': 1},
+
+
+}
 corridor = {
     'name': 'Corridor',
-    'description': 'You find yourself in a long corridor. There are doors towards the West and South.',
-    'exits': {'S': 'Control Room', 'W': 'Storage Room', 'N': 'Cargo Room'},
+    'description': 'You find yourself in a long corridor. There are doors towards the North, East, West and South.',
+    'exits': {'S': 'Control Room', 'W': 'Storage Room', 'N': 'Cargo Room', 'E': 'Cafe'},
     'items': {}
 }
 
@@ -28,21 +45,41 @@ control_room = {
 storage_room = {
     'name': 'Storage Room',
     'description': 'A room filled with boxes and supplies. There is a small locked door in the corner to the North, or return to the corridor to the East.',
-    'exits': {'N': 'Small Door', 'E': 'Corridor', 'S': 'South Storage Room'},
+    'exits': {'N': 'Small Hidden Room', 'E': 'Corridor', 'S': 'South Storage Room'},
     'items': {},
+    # set the room to be locked
     'locked': True,
 }
 
 cargo_room = {
     'name': 'Cargo Room',
     'description': 'A room with crates and vehicles. There is a box to the west, or return to the corridor to the south.',
-    'exits': {'S': 'Corridor',},
-    'items': {'MEDKIT': 1}
+    'exits': {'S': 'Corridor', 'N': 'A Dark Room'},
+    'items': {'MEDKIT': 1},
+    'locked': True,
+    'lock_combination': [1, 0, 1]
 }
 
-small_door_room = {
-    'name': 'Small Door',
-    'description': 'A small, dimly lit room. You spot a gun on a table.',
+boss_room = {
+    'name': 'A Dark Room',
+    'description': 'A room with red blinking lights and a massive dark figure standing in the corner.',
+    'exits': {'S': 'Cargo Room','N': 'Escape Room'},
+    'items': {},
+    'alien': True,
+    'alien_health': 10
+}
+
+escape_room = {
+    'name': 'Escape Room',
+    'description': 'The escape pdd room, leave the ship!!',
+    'exits': {'S': 'Boss Room',},
+    'items': {},
+
+}
+
+small_room = {
+    'name': 'Small Hidden Room',
+    'description': 'A small, dimly lit room. You see something drip above you, a unknown green liquid.',
     'exits': {'S': 'Storage Room'},
     'items': {},
     'alien': True,
@@ -63,7 +100,7 @@ south_storage_room = {
 }
 
 # define the number pad puzzle
-def solve_number_puzzle(current_room):
+def number_puzzle(current_room):
     print("You encounter a locked door with a numeric keypad.")
 
     # get the player's input for the three numbers
@@ -110,14 +147,24 @@ def navigate_room(current_room, direction):
         next_room_name = current_room['exits'][direction]
         next_room = rooms[next_room_name]
 
+        print("Number of exit keys collected:", items['EXIT KEY'])
+
+        # Conditional check
+        if next_room_name == 'Escape Room':
+            if items['EXIT KEY'] == 2:
+                print("You Managed to escape the ship, Congratulations!")
+                exit()
+            else:
+                print("You need to collect 2 exit keys to escape.")
+
         # see if the room is locked
         is_locked = next_room.get('locked', False)
 
         if is_locked:
             # check if player has the access card
-            if next_room_name == 'Control Room':
-                print("The door to the Control Room is locked.")
-                if solve_number_puzzle(next_room):
+            if next_room_name == 'Control Room' or 'Cargo Room':
+                print("The door is locked.")
+                if number_puzzle(next_room):
                     print("You unlock the door.")
                     next_room['locked'] = False
                     return next_room
@@ -192,6 +239,8 @@ def encounter_enemy(current_room, player_stats):
                 print(f"You defeated the alien!")
                 del current_room['alien']
                 del current_room['alien_health']
+                print("You are in shock but managed to kill the alien, you must save your self and get off the ship. The alien dropped a part of the escape pod key")
+                items['EXIT KEY'] += 1
                 break
 
             # when the alien attacks it does random damage between 5 and 15
@@ -213,8 +262,10 @@ def encounter_enemy(current_room, player_stats):
 
 # dictionary with all the rooms
 rooms = {'Crew Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room,
-         'Cargo Room': cargo_room, 'Small Door': small_door_room, 'West Control Room': west_control_room,
-         'South Storage Room': south_storage_room}
+         'Cargo Room': cargo_room, 'Small Hidden Room': small_room, 'West Control Room': west_control_room,
+         'South Storage Room': south_storage_room, 'A Dark Room': boss_room, 'Cafe': cafe, 'South Cafe': south_cafe, 'Escape Room': escape_room}
+
+
 
 # starting room
 current_room = crew_room
@@ -228,14 +279,14 @@ print(
     'Solve puzzles to unlock areas and use tactics and items collected in boss fights to end Dr. Mercer\'s worst nightmare.')
 
 # dictionary with stats and inventory
-player_stats = {"Health": 70, "Suit": 50, "Hunger": 65}
+player_stats = {"Health": 70, "Suit": 50}
 items = {
     "SUIT REPAIR": 0,
     "ACCESS CARD": 0,
     "GUN": 0,
     "KNIFE": 0,
-    "MRE": 1,
-    "MEDKIT": 1
+    "MEDKIT": 1,
+    "EXIT KEY": 0
 }
 
 
@@ -280,14 +331,7 @@ while True:
                     items[item_to_use] -= 1
                 else:
                     print(f"No need to use {item_to_use}. Suit is already at 100%.")
-            elif item_to_use == "MRE":
-                if player_stats["Hunger"] < 100:
-                    hunger_to_restore = min(100 - player_stats["Hunger"], 10)
-                    player_stats["Hunger"] += hunger_to_restore
-                    print(f"Used a {item_to_use}. Hunger decreased by {hunger_to_restore}%.")
-                    items[item_to_use] -= 1
-                else:
-                    print(f"No need to use {item_to_use}. Hunger is already at 100%.")
+
             else:
                 print("Invalid item name.")
         else:
