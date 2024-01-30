@@ -283,7 +283,6 @@ def encounter_enemy(current_room, player_stats):
 
             print(f"Your health: {player_stats['Health']}")
             print(f"Your suit: {player_stats['Suit']}")
-
             if player_stats['Health'] < 0:
                 player_stats['Health'] = 0
                 print("You've been defeated!")
