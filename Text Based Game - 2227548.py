@@ -1,70 +1,119 @@
-# Defining the rooms, with a name, description, exits, and items to pick up
+import random
+
+# dictionaries with dictionaries of the rooms, exits, items or aliens and locked doors
+
 crew_room = {
     'name': 'Crew Room',
-    'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of alarms.\nYou need to find your crew members. The door is towards the south, there is a cupboard to the west.',
+    'description': 'You awaken in a dimly lit room. The air is still, and you can hear distant hums of alarms.\nYou need to find your crew members. The door is towards the south.',
     'exits': {'S': 'Corridor'},
     'items': {}
 }
 
+cafe = {
+    'name': 'Cafe',
+    'description': 'You find the cafe, something catches your eye south of the room.',
+    'exits': {'S': 'South Cafe', 'W': 'Corridor'},
+    'items': {},
+
+
+}
+
+south_cafe = {
+    'name': 'South Cafe',
+    'description': 'You find some supplies. You also see a piece of paper with something you crew-member wrote, "THE 3rd OF JULY(7th MONTH) IS THE 1st TIME I WAS HAPPY". Return to the cafe to the north',
+    'exits': {'N': 'Cafe'},
+    'items': {'MEDKIT': 1, 'SUIT REPAIR': 1},
+
+
+}
 corridor = {
     'name': 'Corridor',
-    'description': 'You find yourself in a long corridor. There are doors towards the West and South.',
-    'exits': {'S': 'Control Room', 'W': 'Storage Room', 'N': 'Cargo Room'},
+    'description': 'You find yourself in a long corridor. There are doors towards the North, East, West and South.',
+    'exits': {'S': 'Control Room', 'W': 'Storage Room', 'N': 'Cargo Room', 'E': 'Cafe'},
     'items': {}
 }
 
 control_room = {
     'name': 'Control Room',
-    'description': 'You enter a room filled with control panels. A computer screen flickers on the west side of the room.',
+    'description': 'You enter a room filled with control panels. A computer screen flickers on the west side of the room. Return to the corridor to the north.',
     'exits': {'N': 'Corridor', 'W': 'West Control Room'},
     'items': {},
     'locked': True,
-    'lock_combination': [3, 7, 1]  # Add a lock combination
+    # lock combination
+    'lock_combination': [3, 7, 1]
 }
 
 storage_room = {
     'name': 'Storage Room',
-    'description': 'A room filled with boxes and supplies. There is a small locked door in the corner to the North, or return to the corridor to the East.',
-    'exits': {'N': 'Small Door', 'E': 'Corridor', 'S': 'South Storage Room'},
+    'description': 'A room filled with boxes and supplies. There is a small door in the corner to the North and a broken box south of the room, or return to the corridor to the East.',
+    'exits': {'N': 'Small Hidden Room', 'E': 'Corridor', 'S': 'South Storage Room'},
     'items': {},
+    # set the room to be locked
     'locked': True,
 }
 
 cargo_room = {
     'name': 'Cargo Room',
-    'description': 'A room with crates and vehicles. There is a box to the west, or return to the corridor to the south.',
-    'exits': {'S': 'Corridor', 'N': 'Locked Room'},
-    'items': {'MEDKIT': 1}
+    'description': 'A room with crates and vehicles. There is a box to the west, a lcoked door north or return to the corridor to the south.',
+    'exits': {'S': 'Corridor', 'N': 'A Dark Room'},
+    'items': {},
+    'locked': True,
+    'lock_combination': [1, 0, 1]
 }
 
-small_door_room = {
-    'name': 'Small Door',
-    'description': 'A small, dimly lit room. You spot a gun on a table.',
+boss_room = {
+    'name': 'A Dark Room',
+    'description': 'A room with red blinking lights and a massive dark figure standing in the corner. Return to the cargo room towards the south.',
+    'exits': {'S': 'Cargo Room','N': 'Escape Room'},
+    'items': {},
+    'alien': True,
+    'alien_health': 150
+}
+
+escape_room = {
+    'name': 'Escape Room',
+    'description': 'You unlocked the escape pod room, leave the ship!! or return to the dark room to the south.',
+    'exits': {'S': 'Boss Room',},
+    'items': {},
+
+}
+
+small_room = {
+    'name': 'Small Hidden Room',
+    'description': 'A small, dimly lit room. You see a unknown green liquid everywhere, You spot a crewmate with something in their hand, a math equation? "(50×2)+(25×2)−49", what could this unlock? Go south to return to the storage room.',
     'exits': {'S': 'Storage Room'},
-    'items': {'GUN': 1}
+    'items': {},
+    'alien': True,
+    'alien_health': 50,
+    'locked': True,
+    'lock_combination': [9, 7, 0 ]
+
 }
 
 west_control_room = {
     'name': 'West Control Room',
     'description': 'Nothing but a access card and a flickering screen. Return to the main control room to the east',
-    'exits': {'E': 'Control Room'},  # Assume there's an exit back to Control Room
-    'items': {'ACCESS CARD': 1},  # Add the key to the west control room
+    'exits': {'E': 'Control Room'},
+    # there will be one access card in the west control room
+    'items': {'ACCESS CARD': 1},
 }
 south_storage_room = {
     'name': 'South Storage Room',
-    'description': 'You found a knife in a broken box, nothing else apart from tools and parts. Head north to return to the centre of the storage room',
-    'exits': {'N': 'Storage Room'},  # Assume there's an exit back to Control Room
-    'items': {'KNIFE': 1},  # Add the key to the west control room
+    'description': 'You found a knife in a broken box, and a code writen in blood on the wall, it reads "970". Head north to return to the centre of the storage room',
+    # exit back to Control Room
+    'exits': {'N': 'Storage Room'},
+    # Add the key to the west control room
+    'items': {'KNIFE': 1, 'SUIT REPAIR': 1},
 }
 
-
-# Define the solve_number_puzzle() function to take the current room as an argument
-def solve_number_puzzle(current_room):
+# define the number pad puzzle, this can be used to multiple doors now
+def number_puzzle(current_room):
     print("You encounter a locked door with a numeric keypad.")
 
     # get the player's input for the three numbers
     guess = []
     while True:
+        # try and except block for exception handling
         try:
             number = int(input("Enter the 1st number: "))
             guess.append(number)
@@ -93,27 +142,38 @@ def solve_number_puzzle(current_room):
     # check if the guess matches the password
     if guess == current_room.get('lock_combination', []):
         print("Congratulations! The door unlocks.")
+        # if the current room has the is_locked variable and the password is right it sets to false to unlock the door.
         current_room['locked'] = False
+        # once the player gets it right no need to run again
         return True
     else:
         print("Incorrect combination. The door remains locked.")
         return False
 
 
-# define navigation and how its done
+# define navigation and how to navigate
 def navigate_room(current_room, direction):
     if direction in current_room['exits']:
         next_room_name = current_room['exits'][direction]
         next_room = rooms[next_room_name]
 
+        print("Number of exit keys collected:", items['EXIT KEY'])
+
+        # Conditional check
+        if next_room_name == 'Escape Room':
+            if items['EXIT KEY'] == 2:
+                print("You Managed to escape the ship, Congratulations!")
+                exit()
+            else:
+                print("You need to collect 2 exit keys to escape.")
+
         # see if the room is locked
         is_locked = next_room.get('locked', False)
 
         if is_locked:
-            # check if player has the access card
-            if next_room_name == 'Control Room':
+            if next_room_name == 'Control Room' or next_room_name == 'Cargo Room' or next_room_name == 'Small Hidden Room':
                 print("The door to the Control Room is locked.")
-                if solve_number_puzzle(next_room):
+                if number_puzzle(next_room):
                     print("You unlock the door.")
                     next_room['locked'] = False
                     return next_room
@@ -122,12 +182,12 @@ def navigate_room(current_room, direction):
                     return current_room
             elif "ACCESS CARD" in items and items["ACCESS CARD"] > 0:
                 print(f"You unlock the door with your access card and enter the {next_room_name}")
-                # unlock the room
                 next_room['locked'] = False
                 return next_room
             else:
                 print(f"The door to {next_room_name} is locked. You need an access card to enter.")
                 return current_room
+
         else:
             # room navigation
             room_items = next_room.get('items', {})
@@ -156,11 +216,65 @@ def navigate_room(current_room, direction):
         print("Invalid direction.")
         return current_room
 
+# define the alien fight function
+def encounter_enemy(current_room, player_stats):
+    if 'alien' in current_room:
+        alien = current_room['alien']
+        alien_health = current_room.get('alien_health', 50)
+        print(f"You encounter an alien!")
+
+        #  alien fight choice
+        while player_stats['Health'] > 0 and alien_health > 0:
+            print("Choose how to attack:")
+            print("1. Normal Attack")
+            print("2. Strong Attack")
+            print("3. Quick Attack")
+            attack_choice = input("Enter your choice (1-3): ")
+
+            if attack_choice == "1":
+                player_damage = random.randint(10, 20)
+            elif attack_choice == "2":
+                player_damage = random.randint(20, 30)
+            elif attack_choice == "3":
+                player_damage = random.randint(5, 15)
+            else:
+                print("Invalid choice. Try again.")
+                continue
+
+            print(f"You attack the alien and deal {player_damage} damage.")
+            alien_health -= player_damage
+
+            if alien_health <= 0:
+                print(f"You defeated the alien!")
+                del current_room['alien']
+                del current_room['alien_health']
+                print("You are in shock but managed to kill the alien, you must save your self and get off the ship. The alien dropped a part of the escape pod key")
+                items['EXIT KEY'] += 1
+                break
+
+            # when the alien attacks it does random damage between 5 and 15
+            alien_damage = random.randint(5, 15)
+            print(f"The alien attacks you and deals {alien_damage} damage.")
+            player_stats['Health'] -= alien_damage
+
+            # suit damage to give the players a sense of armour
+            suit_damage = random.randint(5, 10)
+            print(f"Your suit sustains {suit_damage} damage.")
+            player_stats['Suit'] -= suit_damage
+
+            print(f"Your health: {player_stats['Health']}")
+            print(f"Your suit: {player_stats['Suit']}")
+
+            if player_stats['Health'] <= 0:
+                print("You've been defeated!")
+                exit()
 
 # dictionary with all the rooms
 rooms = {'Crew Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room,
-         'Cargo Room': cargo_room, 'Small Door': small_door_room, 'West Control Room': west_control_room,
-         'South Storage Room': south_storage_room}
+         'Cargo Room': cargo_room, 'Small Hidden Room': small_room, 'West Control Room': west_control_room,
+         'South Storage Room': south_storage_room, 'A Dark Room': boss_room, 'Cafe': cafe, 'South Cafe': south_cafe, 'Escape Room': escape_room}
+
+
 
 # starting room
 current_room = crew_room
@@ -169,23 +283,24 @@ current_room = crew_room
 print('Welcome to Astray')
 print('Awakening alone on a silent space station, the whereabouts of Dr. Mercer\'s fellow crew members are unknown.')
 print(
-    'Dr. Mercer must navigate through the station, find his crew-mates, and discover why the station is powered down.')
+    'Dr. Mercer must navigate through the station, find his crew-mates, and discover what the strange noises are and why the ship is powered down.')
 print(
-    'Solve puzzles to unlock areas and use tactics and items collected in boss fights to end Dr. Mercer\'s worst nightmare.')
+    'Solve puzzles to unlock areas, find all escape keys to flee the ship and use tactics and items collected in fights to end Dr. Mercer\'s worst nightmare.')
 
 # dictionary with stats and inventory
-player_stats = {"Health": 70, "Suit": 50, "Hunger": 65}
+player_stats = {"Health": 70, "Suit": 50}
 items = {
     "SUIT REPAIR": 0,
     "ACCESS CARD": 0,
-    "GUN": 0,
     "KNIFE": 0,
-    "MRE": 1,
-    "MEDKIT": 1
+    "MEDKIT": 1,
+    "EXIT KEY": 0
 }
 
 
 while True:
+    encounter_enemy(current_room, player_stats)
+
     # print current room information
     print(f"\nYou are in {current_room['name']}")
     print(current_room['description'])
@@ -224,14 +339,7 @@ while True:
                     items[item_to_use] -= 1
                 else:
                     print(f"No need to use {item_to_use}. Suit is already at 100%.")
-            elif item_to_use == "MRE":
-                if player_stats["Hunger"] < 100:
-                    hunger_to_restore = min(100 - player_stats["Hunger"], 10)
-                    player_stats["Hunger"] += hunger_to_restore
-                    print(f"Used a {item_to_use}. Hunger decreased by {hunger_to_restore}%.")
-                    items[item_to_use] -= 1
-                else:
-                    print(f"No need to use {item_to_use}. Hunger is already at 100%.")
+
             else:
                 print("Invalid item name.")
         else:
