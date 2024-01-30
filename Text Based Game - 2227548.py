@@ -153,13 +153,16 @@ def number_puzzle(current_room):
 
 # define navigation and how to navigate
 def navigate_room(current_room, direction):
+    # check if the input is a posible exit
     if direction in current_room['exits']:
+        # get the name of the next room
         next_room_name = current_room['exits'][direction]
+        # go into the rooms dict to get details
         next_room = rooms[next_room_name]
 
         print("Number of exit keys collected:", items['EXIT KEY'])
 
-        # Conditional check
+        # check if the next room is the escape room which needs 2 exit keys
         if next_room_name == 'Escape Room':
             if items['EXIT KEY'] == 2:
                 print("You Managed to escape the ship, Congratulations!")
@@ -170,7 +173,9 @@ def navigate_room(current_room, direction):
         # see if the room is locked
         is_locked = next_room.get('locked', False)
 
+        # check if next room is locked
         if is_locked:
+            # if next room is locked and one of these, then its a number puzzle
             if next_room_name == 'Control Room' or next_room_name == 'Cargo Room' or next_room_name == 'Small Hidden Room':
                 print("The door to the Control Room is locked.")
                 if number_puzzle(next_room):
@@ -180,6 +185,7 @@ def navigate_room(current_room, direction):
                 else:
                     print("The door remains locked.")
                     return current_room
+                # otherwise check if you can unlock door with cardz
             elif "ACCESS CARD" in items and items["ACCESS CARD"] > 0:
                 print(f"You unlock the door with your access card and enter the {next_room_name}")
                 next_room['locked'] = False
@@ -189,13 +195,15 @@ def navigate_room(current_room, direction):
                 return current_room
 
         else:
-            # room navigation
+            # room navigation if no card and code needed
+            # check to see what items in next room
             room_items = next_room.get('items', {})
             if room_items and room_items.keys():
                 print(f"You enter the {next_room_name} and find the following items:")
                 for item, quantity in room_items.items():
                     print(f"{item}: Quantity: {quantity}")
 
+                # ask player to pick up items
                 pickup_choice = input("Do you want to pick up all items? (yes/no): ").lower()
 
                 if pickup_choice == 'yes':
@@ -216,9 +224,11 @@ def navigate_room(current_room, direction):
         print("Invalid direction.")
         return current_room
 
-# define the alien fight function
+# define the alien fight function so it can be used in different rooms aswell
 def encounter_enemy(current_room, player_stats):
+    # is alien in the room?
     if 'alien' in current_room:
+        # get alien information
         alien = current_room['alien']
         alien_health = current_room.get('alien_health', 50)
         print(f"You encounter an alien!")
@@ -230,44 +240,55 @@ def encounter_enemy(current_room, player_stats):
             print("2. Strong Attack")
             print("3. Quick Attack")
             attack_choice = input("Enter your choice (1-3): ")
-
+            # damage on alien based on random integer depending on attack type
             if attack_choice == "1":
                 player_damage = random.randint(10, 20)
             elif attack_choice == "2":
-                player_damage = random.randint(20, 30)
+                player_damage = random.randint(15, 30)
             elif attack_choice == "3":
                 player_damage = random.randint(5, 15)
             else:
                 print("Invalid choice. Try again.")
+                # continue the loop
                 continue
-
+            # text telling player whats happening
             print(f"You attack the alien and deal {player_damage} damage.")
             alien_health -= player_damage
 
+
+            # check if alien is dead
             if alien_health <= 0:
                 print(f"You defeated the alien!")
+                # delete alien from the room
                 del current_room['alien']
                 del current_room['alien_health']
                 print("You are in shock but managed to kill the alien, you must save your self and get off the ship. The alien dropped a part of the escape pod key")
+                # add exit key when you kill the alien
                 items['EXIT KEY'] += 1
                 break
 
-            # when the alien attacks it does random damage between 5 and 15
-            alien_damage = random.randint(5, 15)
+            # when the alien attacks it does random damage between 5 and 20
+            alien_damage = random.randint(5, 20)
             print(f"The alien attacks you and deals {alien_damage} damage.")
             player_stats['Health'] -= alien_damage
 
             # suit damage to give the players a sense of armour
-            suit_damage = random.randint(5, 10)
+            suit_damage = random.randint(5, 15)
             print(f"Your suit sustains {suit_damage} damage.")
             player_stats['Suit'] -= suit_damage
+            # ensuring suit health doesnt go below 0. if it hits 0 then it automatically sets it to 0 so no negatives
+            if player_stats['Suit'] < 0:
+                player_stats['Suit'] = 0
+
 
             print(f"Your health: {player_stats['Health']}")
             print(f"Your suit: {player_stats['Suit']}")
 
-            if player_stats['Health'] <= 0:
+            if player_stats['Health'] < 0:
+                player_stats['Health'] = 0
                 print("You've been defeated!")
                 exit()
+
 
 # dictionary with all the rooms
 rooms = {'Crew Room': crew_room, 'Corridor': corridor, 'Control Room': control_room, 'Storage Room': storage_room,
@@ -276,7 +297,7 @@ rooms = {'Crew Room': crew_room, 'Corridor': corridor, 'Control Room': control_r
 
 
 
-# starting room
+# set the starting room
 current_room = crew_room
 
 # starting message
@@ -289,6 +310,7 @@ print(
 
 # dictionary with stats and inventory
 player_stats = {"Health": 70, "Suit": 50}
+
 items = {
     "SUIT REPAIR": 0,
     "ACCESS CARD": 0,
@@ -298,7 +320,9 @@ items = {
 }
 
 
+# loop to have a constant game
 while True:
+    # check for enemies in the current room
     encounter_enemy(current_room, player_stats)
 
     # print current room information
@@ -317,13 +341,17 @@ while True:
 
     # if statements of player choices
     if choice == "1":
+        # display inventory items
         print("INVENTORY:")
         for item, quantity in items.items():
             print(f"{item}: Quantity: {quantity}")
     elif choice == "2":
+        # ask player to type which item they want to use
         item_to_use = input("Enter the name of the item to use: ").upper()
+        # see if item is in inventory dict and can be used
         if item_to_use in items and items[item_to_use] > 0:
             if item_to_use == "MEDKIT":
+                # check what players health is and to only restore up to 100
                 if player_stats["Health"] < 100:
                     health_to_restore = min(100 - player_stats["Health"], 20)
                     player_stats["Health"] += health_to_restore
@@ -331,6 +359,7 @@ while True:
                     items[item_to_use] -= 1
                 else:
                     print(f"No need to use {item_to_use}. Health is already at 100.")
+            # repair suit using same logic as health of not going over 100
             elif item_to_use == "SUIT REPAIR":
                 if player_stats["Suit"] < 100:
                     suit_to_restore = min(100 - player_stats["Suit"], 15)
