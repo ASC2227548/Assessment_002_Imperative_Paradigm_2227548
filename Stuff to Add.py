@@ -33,3 +33,5 @@ def alien_encounter():
 def alien_2():
     print("You encounter another alien")
 
+
+
